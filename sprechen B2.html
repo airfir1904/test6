@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprechen B2 Vorbereitung</title>
+    <style>
+        :root {
+            --primary-color: #000000;
+            --secondary-color: #555;
+            --background-color: #ffffff;
+            --text-color: #000000;
+            --highlight-color: hsl(0, 100%, 99%);
+            --border-color: #000000;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+        
+        /* Sidebar */
+        .sidebar {
+    width: 280px;
+    background-color: black; /* sửa ở đây */
+    color: white;             /* thêm dòng này */
+    border-right: 1px solid var(--border-color);
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+            background-color: var(--primary-color);
+            color: rgb(255, 255, 255);
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+        }
+        
+        .sidebar-menu li {
+            position: relative;
+        }
+        
+        .logo {
+    width: 80px;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+        
+      .menu-item {
+    padding: 15px 25px;
+    display: block;
+    color: white; /* sửa thành trắng */
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s;
+    border-left: 3px solid transparent;
+}
+
+        
+        .menu-item:hover {
+            background-color: var(--highlight-color);
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .menu-item.active {
+            background-color: var(--highlight-color);
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .submenu {
+            list-style: none;
+            display: none;
+            background-color: rgba(0,0,0,0.02);
+        }
+        
+        .submenu.show {
+            display: block;
+        }
+        
+        .submenu-item {
+    padding: 10px 15px 10px 45px;
+    display: block;
+    color: white; /* trắng */
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+        
+        .submenu-item:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+        
+       .submenu-item.active {
+    font-weight: 500;
+    color: #ff0000;  /* màu xanh dương nhạt */
+    background-color: rgba(255, 255, 255, 0.1);  /* nền sáng nhẹ */
+}
+        
+        .sub-submenu {
+            list-style: none;
+            display: none;
+            padding-left: 20px;
+        }
+        
+        .sub-submenu.show {
+            display: block;
+        }
+        
+        .sub-submenu-item {
+    padding: 8px 15px 8px 25px;
+    display: block;
+    color: white; /* trắng */
+    text-decoration: none;
+    font-size: 13px;
+    transition: all 0.3s;
+}
+        
+        .sub-submenu-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .sub-submenu-item.active {
+    font-weight: 500;
+    color: #ff0000;  /* màu xanh dương nhạt */
+    background-color: rgba(255, 255, 255, 0.1);  /* nền sáng nhẹ */
+}
+        
+        .menu-item:hover,
+.submenu-item:hover,
+.sub-submenu-item:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* sáng nhẹ */
+}
+
+.submenu-item,
+.sub-submenu-item {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+        /* Content */
+        .content {
+            flex: 1;
+            padding: 30px;
+            max-width: calc(100% - 280px);
+        }
+        
+        .content-header {
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .content-card {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .info-table th, .info-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .info-table th {
+            background-color: var(--highlight-color);
+            font-weight: 500;
+        }
+        
+        .letter-section {
+            margin-bottom: 30px;
+        }
+        
+        .letter-header {
+            font-size: 20px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--primary-color);
+        }
+        
+        .topic-item {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+        
+        .topic-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        .topic-content {
+            display: none;
+            padding: 15px;
+            background-color: var(--highlight-color);
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        
+        .topic-content.show {
+            display: block;
+        }
+        
+        .exercise-btn {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: var(--primary-color);
+            color: rgb(255, 255, 255);
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+        
+        .exercise-btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .exercise-content {
+            display: none;
+            padding: 15px;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        
+        .exercise-content.show {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .content {
+                max-width: 100%;
+                padding: 20px;
+            }
+        }
+.sidebar-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.sidebar-logo {
+    width: 230px;
+    height: auto;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+
+.sidebar-title {
+    font-size: 19px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.arrow {
+    float: right;
+    transition: transform 0.3s ease;
+}
+
+.logo-3d-flip {
+  width: 200px;
+  height: 200px;
+  perspective: 1000px;
+  margin: 0 auto;
+  grid-column: 2;
+  grid-row: 3;
+}
+
+.flip-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: flipLogo 4s linear infinite;
+}
+
+.flip-inner img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* hoặc 'cover' nếu bạn muốn ảnh lấp đầy */
+  backface-visibility: hidden;
+  border-radius: 12px;
+}
+
+
+/* Mặt trước */
+.flip-front {
+  transform: rotateY(0deg);
+}
+
+/* Mặt sau */
+.flip-back {
+  transform: rotateY(180deg);
+}
+
+@keyframes flipLogo {
+  0%   { transform: rotateY(0deg); }
+  100% { transform: rotateY(360deg); }
+}
+
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+
+<div style="position: absolute; top: 20px; right: 20px; z-index: 1000;">
+  <a href="prüfung.html" style="padding: 10px 20px; background-color: white; color: black; text-decoration: none; border: 2px solid; border-radius: 8px; font-weight: bold;">
+    <--- Quay lại
+  </a>
+</div>
+   <!-- Sidebar -->
+<div class="sidebar">
+    <div class="logo-3d-flip" style="grid-column: 2; grid-row: 3;">
+     
+    <div class="flip-inner">
+      <img src="airfir2.png" alt="Front Logo" class="flip-front" />
+      <img src="airfir2.png" alt="Back Logo" class="flip-back" />
+    </div>
+  </div>
+  
+  <div class="sidebar-title">Sprechen B2 Training</div>
+
+    <ul class="sidebar-menu">
+        <ul class="sidebar-menu">
+            <li>
+  <a href="#" class="menu-item toggleable" data-section="teil1">
+    Teil 1 <span class="arrow" id="arrow-teil1">▶</span>
+  </a>
+  <ul class="submenu" id="teil1Submenu"></ul>
+</li>
+<li>
+  <a href="#" class="menu-item toggleable" data-section="teil2">
+    Teil 2 <span class="arrow" id="arrow-teil2">▶</span>
+  </a>
+  <ul class="submenu" id="teil2Submenu"></ul>
+</li>
+        </ul>
+    </div>
+    
+    <!-- Content -->
+    <div class="content">
+        <!-- Introduction Section -->
+        <div id="introduction" class="content-section">
+            <div class="content-header">
+                <h1>Thông tin giới thiệu</h1>
+            </div>
+            <div class="content-card">
+                <table class="info-table">
+                    <tr>
+                        <th>Thông tin</th>
+                        <th>Chi tiết</th>
+                    </tr>
+                    <tr>
+                        <td>Tên khóa học</td>
+                        <td>Sprechen B2 Vorbereitung</td>
+                    </tr>
+                    <tr>
+                        <td>Mục tiêu</td>
+                        <td>Chuẩn bị cho kỳ thi nói tiếng Đức trình độ B2</td>
+                    </tr>
+                    <tr>
+                        <td>Nội dung</td>
+                        <td>Gồm 2 phần chính: Teil 1 và Teil 2 theo cấu trúc bài thi</td>
+                    </tr>
+                    <tr>
+                        <td>Phương pháp</td>
+                        <td>Học theo chủ đề, từ vựng và thực hành nói</td>
+                    </tr>
+                    <tr>
+                        <td>Tài liệu</td>
+                        <td>Cung cấp đầy đủ tài liệu và bài tập thực hành</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Teil 1 Section -->
+        <div id="teil1" class="content-section" style="display: none;">
+            <div class="content-header">
+                <h1>Teil 1: Präsentation</h1>
+                <p>Trình bày về một chủ đề đã chuẩn bị trước</p>
+            </div>
+            <div id="teil1-content" class="content-card">
+                <p>Chọn một chữ cái từ menu bên trái để xem các chủ đề</p>
+            </div>
+        </div>
+        
+        <!-- Teil 2 Section -->
+        <div id="teil2" class="content-section" style="display: none;">
+            <div class="content-header">
+                <h1>Teil 2: Diskussion</h1>
+                <p>Thảo luận về một chủ đề ngẫu nhiên</p>
+            </div>
+            <div id="teil2-content" class="content-card">
+                <p>Chọn một chữ cái từ menu bên trái để xem các chủ đề</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // German alphabet (including umlauts and ß)
+            const germanAlphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 
+                                   'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+                                   'Ä', 'Ö', 'Ü', 'ß'];
+            
+            // Sample topics for each letter
+            const topics = {
+                'A': ['Arbeit', 'Ausbildung', 'Alltag'],
+                'B': ['Beruf', 'Bildung', 'Beziehungen'],
+                'C': ['Computer', 'Café', 'Clubs'],
+                'D': ['Deutschland', 'Dokumente', 'Daten'],
+                'E': ['Ernährung', 'Elektronik', 'Einkaufen'],
+                'F': ['Familie', 'Freizeit', 'Feste'],
+                'G': ['Gesundheit', 'Geld', 'Geschichte'],
+                'H': ['Hobbys', 'Haushalt', 'Hotels'],
+                'I': ['Internet', 'Immobilien', 'Infos'],
+                'J': ['Jobs', 'Jugend', 'Jahreszeiten'],
+                'K': ['Kultur', 'Kochen', 'Kinder'],
+                'L': ['Lernen', 'Liebe', 'Landschaft'],
+                'M': ['Medien', 'Musik', 'Mobilität'],
+                'N': ['Nachrichten', 'Natur', 'Nachbarschaft'],
+                'O': ['Öffentlichkeit', 'Organisation', 'Orte'],
+                'P': ['Politik', 'Produkte', 'Projekte'],
+                'Q': ['Qualität', 'Quellen', 'Qualifikation'],
+                'R': ['Reisen', 'Regeln', 'Religion'],
+                'S': ['Sport', 'Schule', 'Sicherheit'],
+                'T': ['Technologie', 'Transport', 'Tradition'],
+                'U': ['Umwelt', 'Universität', 'Urlaub'],
+                'V': ['Verkehr', 'Verwaltung', 'Vereine'],
+                'W': ['Wohnen', 'Wirtschaft', 'Wetter'],
+                'X': ['Xylophon', 'Xenophobie', 'Xenial'],
+                'Y': ['Yoga', 'YouTube', 'Yacht'],
+                'Z': ['Zukunft', 'Zeit', 'Zimmer'],
+                'Ä': ['Ämter', 'Ärzte', 'Änderungen'],
+                'Ö': ['Öffentlich', 'Ökologie', 'Österreich'],
+                'Ü': ['Übung', 'Übersetzung', 'Überraschung'],
+                'ß': ['Straße', 'Maßnahme', 'Gruß']
+            };
+            
+            // Sample exercises for each topic
+            const exercises = {
+    'Arbeit': {
+        title: 'Arbeitsmodell',
+        aufgabe: 'Sprechen Sie über verschiedene Arbeitsmodelle in Deutschland und weltweit...',
+        vorteile: ' Vorteile :  \n+ Homeoffice ist flexibel, spart Zeit und Kosten \n +..... \nNachteil: \n- fehlender sozialer Kontakt.',
+        redemittel: 'Ich bin der Meinung, dass... / Einerseits... andererseits...',
+        redewendungen: 'Viele Wege führen nach Rom. / Wer arbeitet, macht Fehler.',
+        struktur: 'Einleitung → Vorteile/Nachteile → eigene Meinung → Schluss.'
+    },
+    'Ausbildung': {
+        title: 'Ausbildungssystem',
+        aufgabe: 'Beschreiben Sie das deutsche Ausbildungssystem. Welche Unterschiede gibt es zu Ihrem Heimatland?',
+        vorteile: 'Duale Ausbildung verbindet Theorie und Praxis.',
+        redemittel: 'Ein Vorteil ist..., Ein Nachteil könnte sein...',
+        redewendungen: 'Übung macht den Meister.',
+        struktur: 'Einleitung – Vergleich – Vorteile/Nachteile – Fazit.'
+    }
+    // Bạn thêm tiếp các topic khác như vậy
+};
+
+            
+            // Generate submenus for Teil 1 and Teil 2
+            const teil1Submenu = document.getElementById('teil1Submenu');
+            const teil2Submenu = document.getElementById('teil2Submenu');
+            
+            germanAlphabet.forEach(letter => {
+                // Create letter menu items for Teil 1
+                const teil1LetterItem = document.createElement('li');
+                teil1LetterItem.innerHTML = `
+                    <a href="#" class="submenu-item" data-section="teil1" data-letter="${letter}">${letter}</a>
+                    <ul class="sub-submenu" id="teil1-letter-${letter}">
+                        ${topics[letter].map(topic => `<li><a href="#" class="sub-submenu-item" data-section="teil1" data-letter="${letter}" data-topic="${topic}">${topic}</a></li>`).join('')}
+                    </ul>
+                `;
+                teil1Submenu.appendChild(teil1LetterItem);
+                
+                // Create letter menu items for Teil 2
+                const teil2LetterItem = document.createElement('li');
+                teil2LetterItem.innerHTML = `
+                    <a href="#" class="submenu-item" data-section="teil2" data-letter="${letter}">${letter}</a>
+                    <ul class="sub-submenu" id="teil2-letter-${letter}">
+                        ${topics[letter].map(topic => `<li><a href="#" class="sub-submenu-item" data-section="teil2" data-letter="${letter}" data-topic="${topic}">${topic}</a></li>`).join('')}
+                    </ul>
+                `;
+                teil2Submenu.appendChild(teil2LetterItem);
+            });
+            
+            // Menu item click handler
+           
+            // Submenu item click handler for letters
+            document.querySelectorAll('.submenu-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Update active menu items
+                    document.querySelectorAll('.submenu-item').forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show the corresponding sub-submenu
+                    const section = this.getAttribute('data-section');
+                    const letter = this.getAttribute('data-letter');
+                    
+                    // Hide all sub-submenus first
+                    document.querySelectorAll('.sub-submenu').forEach(menu => {
+                        menu.classList.remove('show');
+                    });
+                    
+                    // Show the selected sub-submenu
+                    const subSubmenu = document.getElementById(`${section}-letter-${letter}`);
+                    subSubmenu.classList.add('show');
+                    
+                    // Reset sub-submenu selections
+                    document.querySelectorAll('.sub-submenu-item').forEach(i => i.classList.remove('active'));
+                });
+            });
+            
+            // Sub-submenu item click handler for topics
+            document.querySelectorAll('.sub-submenu-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Update active menu items
+                    document.querySelectorAll('.sub-submenu-item').forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const section = this.getAttribute('data-section');
+                    const letter = this.getAttribute('data-letter');
+                    const topic = this.getAttribute('data-topic');
+                    
+                    // Generate content for the selected topic
+                    let content = '';
+                    
+                    if (section === 'teil1') {
+                        content = `
+                            <div class="letter-section">
+                                <h2 class="letter-header">${letter}: ${topic}</h2>
+                                ${topics[letter].filter(t => t === topic).map(t => `
+                                    <div class="topic-item">
+                                        <h3 class="topic-title">${exercises[t]?.title || 'Thema ' + t}</h3>
+                                        <button class="exercise-btn" data-topic="${t}" data-type="aufgabe">Bài làm</button>
+<button class="exercise-btn" data-topic="${t}" data-type="vorteile">Vorteile und Nachteile</button>
+<button class="exercise-btn" data-topic="${t}" data-type="redemittel">Redemittel</button>
+<button class="exercise-btn" data-topic="${t}" data-type="redewendungen">Redewendungen</button>
+<button class="exercise-btn" data-topic="${t}" data-type="struktur">Struktur</button>
+
+<div class="exercise-content" id="exercise-${t}-aufgabe"></div>
+<div class="exercise-content" id="exercise-${t}-vorteile"></div>
+<div class="exercise-content" id="exercise-${t}-redemittel"></div>
+<div class="exercise-content" id="exercise-${t}-redewendungen"></div>
+<div class="exercise-content" id="exercise-${t}-struktur"></div>
+
+                                        <div class="exercise-content" id="exercise-${t}">
+                                            <p>${exercises[t]?.infor || 'Nội dung bài tập sẽ được hiển thị ở đây.'}</p>
+                                            <p>${exercises[t]?.vorundnach || 'Nội dung  sẽ được hiển thị ở đây.'}</p>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            
+                        `;
+                        
+                        document.getElementById('teil1-content').innerHTML = content;
+                    } else if (section === 'teil2') {
+                        content = `
+                            <div class="letter-section">
+                                <h2 class="letter-header">${letter}: ${topic}</h2>
+                                ${topics[letter].filter(t => t === topic).map(t => `
+                                    <div class="topic-item">
+                                        <h3 class="topic-title">${exercises[t]?.title || 'Thema ' + t}</h3>
+                                        <div class="topic-content show">
+                                            <p>${exercises[t]?.content || 'Nội dung thảo luận sẽ được hiển thị ở đây.'}</p>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                        
+                        document.getElementById('teil2-content').innerHTML = content;
+                    }
+
+                    // Hiển thị phần nội dung đúng
+document.querySelectorAll('.content-section').forEach(section => {
+    section.style.display = 'none';
+});
+
+if (section === 'teil1') {
+    document.getElementById('teil1').style.display = 'block';
+} else if (section === 'teil2') {
+    document.getElementById('teil2').style.display = 'block';
+}
+
+                    
+                    
+                    document.querySelectorAll('.exercise-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const topic = this.getAttribute('data-topic');
+                            const type = this.getAttribute('data-type');
+                            const exerciseBox = document.getElementById(`exercise-${topic}-${type}`);
+                             ['aufgabe', 'vorteile', 'redemittel', 'redewendungen', 'struktur'].forEach(t => {
+            const box = document.getElementById(`exercise-${topic}-${t}`);
+            if (box && t !== type) box.classList.remove('show');
+        });
+        if (exerciseBox) {
+            const text = (exercises[topic]?.[type] || 'Chưa có nội dung cho phần này.').replace(/\n/g, '<br>');
+exerciseBox.innerHTML = `<p>${text}</p>`;
+            exerciseBox.classList.toggle('show');
+        }
+                        });
+                    });
+                });
+            });
+            // Toggle submenu when clicking on Teil 1 / Teil 2
+document.querySelectorAll('.toggleable').forEach(item => {
+    item.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        const section = this.getAttribute('data-section');
+        const submenu = document.getElementById(section + 'Submenu');
+        const arrow = document.getElementById('arrow-' + section);
+
+        // Ẩn tất cả submenu khác và đặt lại mũi tên
+        document.querySelectorAll('.submenu').forEach(menu => {
+            if (menu !== submenu) menu.classList.remove('show');
+        });
+        document.querySelectorAll('.arrow').forEach(a => {
+            if (a !== arrow) a.textContent = '▶';
+        });
+
+        // Toggle submenu hiện tại
+        submenu.classList.toggle('show');
+
+        // Đổi mũi tên
+        if (submenu.classList.contains('show')) {
+            arrow.textContent = '▼';
+        } else {
+            arrow.textContent = '▶';
+        }
+    });
+});
+
+
+            
+            // Initialize with Introduction section
+            document.getElementById('introduction').style.display = 'block';
+        });
+    </script>
+</body>
+</html>
+

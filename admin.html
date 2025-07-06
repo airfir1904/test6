@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-database.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .login-container {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e0e0e0;
+        }
+        .dashboard-card {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: 500;
+        }
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        .gradient-btn {
+            background: linear-gradient(135deg, #4a4a4a 0%, #262626 100%);
+            color: white;
+        }
+        .gradient-btn:hover {
+            background: linear-gradient(135deg, #262626 0%, #4a4a4a 100%);
+        }
+        table th, table td {
+  text-align: center;
+}
+
+    </style>
+</head>
+<body class="min-h-screen bg-gray-100 flex flex-col">
+
+    
+    <div style="position: absolute; top: 20px; left: 20px; z-index: 1000;">
+  <a href="index.html" style="padding: 10px 20px; background-color: white; color: black; text-decoration: none; border: 2px solid; border-radius: 8px; font-weight: bold;">
+    Home
+  </a>
+</div> 
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="login-container bg-white rounded-lg p-8 w-full max-w-md">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">ADMIN DASHBOARD</h2>
+                <p class="text-gray-600 mt-2">Vui lòng đăng nhập để tiếp tục</p>
+            </div>
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label for="name" class="block text-gray-700 text-sm font-medium mb-2">Họ và tên</label>
+                    <input type="text" id="name" name="name" required 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+                        placeholder="Nhập họ và tên">
+                </div>
+                <div class="mb-6">
+                    <label for="password" class="block text-gray-700 text-sm font-medium mb-2">Mật khẩu</label>
+                    <input type="password" id="password" name="password" required 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+                        placeholder="Nhập mật khẩu">
+                </div>
+                <div class="flex justify-between items-center">
+                    <button type="submit" class="gradient-btn px-6 py-2 rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                        Đăng nhập
+                    </button>
+                    <a href="#" class="text-sm text-gray-600 hover:text-gray-800">Quên mật khẩu?</a>
+                </div>
+            </form>
+            <div id="loginError" class="mt-4 text-red-500 text-sm hidden"></div>
+        </div>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-container hidden">
+        <header class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+                <h1 class="text-xl font-bold text-gray-900">Admin Dashboard</h1>
+                <div class="flex items-center space-x-4">
+                    <span id="welcomeMessage" class="text-gray-700"></span>
+                    <button id="logoutBtn" class="bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition">
+                        Đăng xuất
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-grow">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="dashboard-card bg-white p-6 rounded-lg">
+                        <div class="flex justify-between items-start mb-4">
+                            <h2 class="text-lg font-medium text-gray-900">Người dùng phổ thông</h2>
+                            <span id="userCount" class="text-3xl font-bold text-gray-900">0</span>
+                        </div>
+                        <div class="mb-4 flex justify-between items-center">
+                            <div class="flex space-x-2">
+                                <button id="recentFilter" class="px-3 py-1 border rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200">Mới nhất</button>
+                                <button id="oldestFilter" class="px-3 py-1 border rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200">Lâu nhất</button>
+                            </div>
+                            <input type="text" id="userSearch" placeholder="Tìm kiếm người dùng..." 
+                                   class="px-3 py-1 border rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400">
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table id="usersTable">
+                                <thead>
+                                      <tr>
+                                     <th>STT</th>
+                                     <th>Họ tên</th>
+                                    <th>Gmail</th>
+                                   <th>Mật khẩu</th> 
+                                  <th>Thời gian</th>
+                                   <th>Trạng thái</th>
+                                    <th>Xóa</th>
+                                         </tr>
+                                     </thead>
+
+                                <tbody id="usersTableBody">
+                                    <!-- Users will be inserted here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card bg-white p-6 rounded-lg">
+                        <div class="flex justify-between items-start mb-4">
+                            <h2 class="text-lg font-medium text-gray-900">Số lượng admin</h2>
+                            <span id="adminCount" class="text-3xl font-bold text-gray-900">0</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table id="adminsTable">
+                                <thead>
+                                    <tr>
+                                        <th>STT</th>
+                                        <th>Họ tên</th>
+                                        <th>Thời gian đăng nhập</th>
+                                        <th>Thời gian đăng xuất</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminsTableBody">
+                                    <!-- Admins will be inserted here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+                <!-- Thành viên miễn phí -->
+<div class="dashboard-card bg-white p-6 rounded-lg mb-6">
+    <h2 class="text-lg font-medium text-gray-900 mb-4">Thành viên miễn phí</h2>
+    <div class="overflow-x-auto">
+        <table id="freeUsersTable" class="w-full">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Họ tên</th>
+                    <th>Mật khẩu</th>
+                    <th>Thời gian</th>
+                    <th>Xóa</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Người dùng miễn phí sẽ được render bằng JS -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<!-- Thành viên Premium -->
+<div class="dashboard-card bg-white p-6 rounded-lg mb-6">
+  <h2 class="text-lg font-medium text-gray-900 mb-4">Thành viên Premium</h2>
+  <div class="overflow-x-auto">
+    <table id="premiumUsersTable" class="w-full">
+      <thead>
+        <tr>
+          <th>STT</th>
+          <th>Họ tên</th>
+          <th>Mật khẩu</th>
+          <th>Thời gian</th>
+          <th>Xóa</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Người dùng premium sẽ render bằng JS -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+
+                <!-- Add User Form (Admin only) -->
+                <div id="addUserSection" class="hidden">
+                    <div class="dashboard-card bg-white p-6 rounded-lg mb-6">
+                        <h2 class="text-lg font-medium text-gray-900 mb-4">Thêm người dùng mới</h2>
+                        <form id="addUserForm" class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="newUserName" class="block text-sm font-medium text-gray-700">Họ và tên</label>
+                                    <input type="text" id="newUserName" name="newUserName" required 
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
+                                </div>
+                                <div>
+                                    <label for="newUserPassword" class="block text-sm font-medium text-gray-700">Mật khẩu</label>
+                                    <input type="password" id="newUserPassword" name="newUserPassword" required 
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
+                                </div>
+                                <div>
+  <label for="userType" class="block text-sm font-medium text-gray-700">Loại tài khoản</label>
+  <select id="userType" name="userType" required 
+          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
+    <option value="free">Miễn phí</option>
+    <option value="regular">Phổ thông</option>
+    <option value="premium">Premium</option>
+  </select>
+</div>
+
+                            </div>
+                            <div class="flex justify-end">
+                                <button type="submit" class="gradient-btn px-6 py-2 rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                                    Thêm người dùng
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+
+                <!-- Bảng thống kê theo tháng -->
+
+<div id="monthlyStats" class="dashboard-card bg-white p-6 rounded-lg mb-6">
+  <h2 class="text-lg font-medium text-gray-900 mb-4">Biểu Đồ</h2>
+  <div class="mb-4">
+    <button id="analyzeBtn" class="gradient-btn px-4 py-2 rounded-md">Phân tích</button>
+   
+  </div>
+  <canvas id="userChart" height="150"></canvas>
+  <table class="w-full">
+    <thead>
+      <tr>
+        <th class="border px-2 py-1">Tháng</th>
+        <th class="border px-2 py-1">Số người dùng</th>
+        <th class="border px-2 py-1">Tài khoản Phổ Thông</th>
+        <th class="border px-2 py-1">Tài khoản Miễn Phí</th>
+        <th class="border px-2 py-1">Tài khoản Premium</th>
+        <th class="border px-2 py-1">Biến động</th>
+      </tr>
+    </thead>
+    <tbody id="monthlyStatsBody"></tbody>
+  </table>
+</div>
+
+
+                <!-- Disclaimer -->
+                <div class="mt-8 text-center text-sm text-gray-500">
+                    <p>Hệ thống quản lý người dùng - Phiên bản 1.0.0</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // User database including admin users
+        const userDatabase = [
+            { name: "Võ Thành Duy", password: "19042005", isAdmin: true },
+            { name: "Nguyễn Tăng Gia Hưng", password: "19092005", isAdmin: true },
+            { name: "Trần Vân Anh", password: "01082006", isAdmin: true },
+            { name: "Thịnh Nguyễn ", password: "06082007", isAdmin: true },
+            // Add more users here in the same format
+        ];
+
+        // Storage for regular users (non-admin)
+        let regularUsers = JSON.parse(localStorage.getItem('regularUsers')) || [];
+
+        
+        // Current session
+        let currentUser = null;
+
+        // DOM Elements
+        const loginModal = document.getElementById('loginModal');
+        const loginForm = document.getElementById('loginForm');
+        const loginError = document.getElementById('loginError');
+        const dashboardContainer = document.querySelector('.dashboard-container');
+        const welcomeMessage = document.getElementById('welcomeMessage');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const usersTableBody = document.getElementById('usersTableBody');
+        const adminsTableBody = document.getElementById('adminsTableBody');
+        const freeUsersTableBody = document.querySelector("#freeUsersTable tbody");
+        const userCount = document.getElementById('userCount');
+        const premiumUsersTableBody = document.querySelector("#premiumUsersTable tbody");
+        const adminCount = document.getElementById('adminCount');
+        const addUserSection = document.getElementById('addUserSection');
+        const addUserForm = document.getElementById('addUserForm');
+
+        // Show login modal initially
+        loginModal.classList.remove('hidden');
+
+        // Login form submission
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            // Validate name and password
+            const user = userDatabase.find(u => u.name.toLowerCase() === name.toLowerCase() && u.password === password);
+            
+            if (user) {
+                currentUser = user;
+                loginModal.classList.add('hidden');
+                dashboardContainer.classList.remove('hidden');
+                welcomeMessage.textContent = `Xin chào, ${user.name}`;
+                renderUserChart(regularUsers);
+
+
+                // If admin, show add user section
+                if (user.isAdmin) {
+                    addUserSection.classList.remove('hidden');
+                } else {
+                    addUserSection.classList.add('hidden');
+                }
+
+                // Update tables
+                updateTables();
+            } else {
+                loginError.textContent = "Tên đăng nhập hoặc mật khẩu không đúng.";
+                loginError.classList.remove('hidden');
+            }
+        });
+
+        // Logout button click
+        logoutBtn.addEventListener('click', function() {
+            if (currentUser && currentUser.isAdmin) {
+                localStorage.setItem(`admin_${currentUser.name}_logout`, new Date().toISOString());
+                // Update admin table immediately
+                updateTables();
+            }
+            currentUser = null;
+            dashboardContainer.classList.add('hidden');
+            loginModal.classList.remove('hidden');
+            loginForm.reset();
+            loginError.classList.add('hidden');
+        });
+
+        // Record admin login time
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            const user = userDatabase.find(u => u.name.toLowerCase() === name.toLowerCase() && u.password === password);
+            
+            if (user) {
+                currentUser = user;
+                if (user.isAdmin) {
+                    localStorage.setItem(`admin_${user.name}_login`, new Date().toISOString());
+                }
+            }
+        });
+
+        // Add new user (admin only)
+        addUserForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newName = document.getElementById('newUserName').value.trim();
+            const newPassword = document.getElementById('newUserPassword').value.trim();
+            
+            if (!newName || !newPassword) {
+                alert('Vui lòng nhập đầy đủ thông tin');
+                return;
+            }
+            
+            // Check if user already exists
+            const userExists = [...userDatabase, ...regularUsers].some(
+                u => u.name.toLowerCase() === newName.toLowerCase()
+            );
+            
+            if (userExists) {
+                alert('Người dùng đã tồn tại');
+                return;
+            }
+            
+    const userType = document.getElementById('userType').value;
+
+const newUser = {
+  name: newName,
+  password: newPassword,
+  isAdmin: false,
+  loginTime: new Date().toISOString(),
+  type: userType  // ✅ đúng loại người dùng
+};
+
+
+            
+            regularUsers.push(newUser);
+            localStorage.setItem('regularUsers', JSON.stringify(regularUsers));
+            
+            // Update tables
+            updateTables();
+            
+            // Reset form
+            addUserForm.reset();
+            alert('Thêm người dùng thành công');
+        });
+
+        // User sorting and filtering
+        const sortUsers = (type = 'newest') => {
+            return [...regularUsers].sort((a, b) => {
+                const dateA = new Date(a.loginTime);
+                const dateB = new Date(b.loginTime);
+                return type === 'newest' ? dateB - dateA : dateA - dateB;
+            });
+        };
+
+        // Search users
+        const searchUsers = (query) => {
+            return regularUsers.filter(user => 
+                user.name.toLowerCase().includes(query.toLowerCase())
+            );
+        };
+
+        // Update tables with user data
+      function updateTables() {
+  usersTableBody.innerHTML = '';
+  adminsTableBody.innerHTML = '';
+  freeUsersTableBody.innerHTML = '';
+  premiumUsersTableBody.innerHTML = '';
+
+  // Hiển thị người dùng phổ thông
+  const countedUsers = regularUsers.filter(u => u.type !== 'free' && u.type !== 'premium');
+  countedUsers.forEach((user, index) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${user.name}</td>
+      <td>${user.email || 'Không có'}</td>
+      <td>${user.password || 'Không có'}</td>
+      <td>${formatDate(user.loginTime)}</td>
+      <td><span class="inline-block px-2 py-1 rounded-full bg-green-100 text-green-800">Đang hoạt động</span></td>
+      <td><button class="text-red-600 hover:underline deleteUserBtn" data-index="${index}">Xóa</button></td>
+    `;
+    usersTableBody.appendChild(row);
+  });
+
+  // Hiển thị miễn phí
+  const freeUsers = regularUsers.filter(u => u.type === 'free');
+  freeUsers.forEach((user, index) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${user.name}</td>
+      <td>${user.password}</td>
+      <td>${formatDate(user.loginTime)}</td>
+      <td><button class="text-red-600 hover:underline deleteFreeUserBtn" data-index="${index}">Xóa</button></td>
+    `;
+    freeUsersTableBody.appendChild(row);
+  });
+
+  // ✅ Hiển thị premium
+  const premiumUsers = regularUsers.filter(u => u.type === 'premium');
+  premiumUsers.forEach((user, index) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${user.name}</td>
+      <td>${user.password}</td>
+      <td>${formatDate(user.loginTime)}</td>
+      <td><button class="text-red-600 hover:underline deletePremiumUserBtn" data-index="${index}">Xóa</button></td>
+    `;
+    premiumUsersTableBody.appendChild(row);
+  });
+
+  // Đếm
+  userCount.textContent = countedUsers.length;
+  adminCount.textContent = userDatabase.length;
+
+  // Xoá phổ thông
+  document.querySelectorAll('.deleteUserBtn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const index = this.dataset.index;
+      const userToDelete = countedUsers[index];
+      const realIndex = regularUsers.findIndex(u =>
+        u.name === userToDelete.name && u.password === userToDelete.password
+      );
+      if (realIndex !== -1 && confirm("Bạn có chắc chắn muốn xóa?")) {
+        regularUsers.splice(realIndex, 1);
+        localStorage.setItem('regularUsers', JSON.stringify(regularUsers));
+        updateTables();
+      }
+    });
+  });
+
+  // Xoá free
+  document.querySelectorAll('.deleteFreeUserBtn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const index = this.dataset.index;
+      const freeUsers = regularUsers.filter(u => u.type === 'free');
+      const userToDelete = freeUsers[index];
+      const realIndex = regularUsers.findIndex(u =>
+        u.name === userToDelete.name && u.password === userToDelete.password
+      );
+      if (realIndex !== -1 && confirm("Bạn có chắc chắn muốn xóa?")) {
+        regularUsers.splice(realIndex, 1);
+        localStorage.setItem('regularUsers', JSON.stringify(regularUsers));
+        updateTables();
+      }
+    });
+  });
+
+  // ✅ Xoá premium
+  document.querySelectorAll('.deletePremiumUserBtn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const index = this.dataset.index;
+      const premiumUsers = regularUsers.filter(u => u.type === 'premium');
+      const userToDelete = premiumUsers[index];
+      const realIndex = regularUsers.findIndex(u =>
+        u.name === userToDelete.name && u.password === userToDelete.password
+      );
+      if (realIndex !== -1 && confirm("Bạn có chắc chắn muốn xóa?")) {
+        regularUsers.splice(realIndex, 1);
+        localStorage.setItem('regularUsers', JSON.stringify(regularUsers));
+        updateTables();
+      }
+    });
+  });
+
+  // Admin
+  userDatabase.forEach((admin, index) => {
+    const lastLogin = localStorage.getItem(`admin_${admin.name}_login`);
+    const lastLogout = localStorage.getItem(`admin_${admin.name}_logout`);
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${admin.name}</td>
+      <td>${lastLogin ? formatDate(lastLogin) : 'Chưa đăng nhập'}</td>
+      <td>${lastLogout ? formatDate(lastLogout) : 'Chưa đăng xuất'}</td>
+    `;
+    adminsTableBody.appendChild(row);
+  });
+}
+
+
+        // Event listeners for sorting and searching
+        document.getElementById('recentFilter').addEventListener('click', () => {
+            const sortedUsers = sortUsers('newest');
+            renderUsers(sortedUsers);
+        });
+
+        document.getElementById('oldestFilter').addEventListener('click', () => {
+            const sortedUsers = sortUsers('oldest');
+            renderUsers(sortedUsers);
+        });
+
+        document.getElementById('userSearch').addEventListener('input', (e) => {
+            const searchedUsers = searchUsers(e.target.value);
+            renderUsers(searchedUsers);
+        });
+
+        // Render users function
+        function renderUsers(users) {
+            usersTableBody.innerHTML = '';
+            users.forEach((user, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${user.name}</td>
+                    <td>${formatDate(user.loginTime)}</td>
+                    <td><span class="inline-block px-2 py-1 rounded-full bg-green-100 text-green-800">Đang hoạt động</span></td>
+                `;
+                usersTableBody.appendChild(row);
+            });
+            userCount.textContent = users.length;
+        }
+
+        // Format date for display
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        }
+
+        // Phân tích thống kê người dùng theo tháng
+function getMonthlyStats(users) {
+    const stats = {};
+    users.forEach(u => {
+        const date = new Date(u.loginTime);
+        const key = `${date.getMonth() + 1}/${date.getFullYear()}`;
+        if (!stats[key]) stats[key] = { total: 0, free: 0, premium: 0, regular: 0 };
+
+        // Xác định đúng loại user
+        if (u.type === 'free') {
+            stats[key].free++;
+        } else if (u.type === 'premium') {
+            stats[key].premium++;
+        } else {
+            stats[key].regular++; // Người dùng phổ thông
+        }
+
+        // Tổng = tất cả loại
+        stats[key].total = stats[key].free + stats[key].regular + stats[key].premium;
+    });
+    return stats;
+}
+
+
+// Gán sự kiện cho nút
+document.getElementById('analyzeBtn').addEventListener('click', analyzeStats);
+document.getElementById('resetStatsBtn').addEventListener('click', resetStats);
+
+
+function analyzeStats() {
+  const stats = getMonthlyStats(regularUsers);
+  const sortedMonths = Object.keys(stats).sort((a, b) => {
+    const [ma, ya] = a.split('/').map(Number);
+    const [mb, yb] = b.split('/').map(Number);
+    return new Date(ya, ma - 1) - new Date(yb, mb - 1);
+  });
+  const body = document.getElementById('monthlyStatsBody');
+  body.innerHTML = '';
+
+  sortedMonths.forEach(month => {
+    const s = stats[month];
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td class="border px-2 py-1 text-center">${month}</td>
+      <td class="border px-2 py-1 text-center">${s.total}</td>
+      <td class="border px-2 py-1 text-center">${s.free}</td>
+      <td class="border px-2 py-1 text-center">${s.regular}</td>
+      <td class="border px-2 py-1 text-center">${s.premium}</td>
+      <td class="border px-2 py-1 text-center">0</td> <!-- Hoặc tự tính biến động -->
+    `;
+    body.appendChild(row);
+  });
+}
+
+function renderUserChart(users) {
+    const stats = getMonthlyStats(users);
+    const sortedMonths = Object.keys(stats).sort((a, b) => {
+        const [ma, ya] = a.split('/').map(Number);
+        const [mb, yb] = b.split('/').map(Number);
+        return new Date(ya, ma - 1) - new Date(yb, mb - 1);
+    });
+
+    const labels = sortedMonths;
+    const totalUsers = sortedMonths.map(m => stats[m].total);
+    const freeUsers = sortedMonths.map(m => stats[m].free);
+    const premiumUsers = sortedMonths.map(m => stats[m].premium);
+    const regularUsers = sortedMonths.map(m => stats[m].regular);
+
+
+    const ctx = document.getElementById('userChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels,
+          datasets: [
+    {
+        label: 'Tổng người dùng',
+        backgroundColor: '#4B5563',
+        data: totalUsers,
+    },
+    {
+        label: 'Phổ thông', // đổi chỗ lên trước
+        backgroundColor: '#10B981',
+        data: regularUsers,
+    },
+    {
+        label: 'Miễn phí',
+        backgroundColor: '#60A5FA',
+        data: freeUsers,
+    },
+    {
+        label: 'Premium',
+        backgroundColor: '#FBBF24',
+        data: premiumUsers,
+    }
+]
+
+
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' },
+                title: { display: true, text: 'Thống kê người dùng theo tháng' }
+            }
+        }
+    });
+}
+
+function resetStats() {
+    // Xóa biểu đồ hiện tại
+    const oldCanvas = document.getElementById('userChart');
+    const parent = oldCanvas.parentElement;
+
+    oldCanvas.remove(); // Xóa canvas cũ
+
+    // Tạo và gắn canvas mới vào đúng vị trí cũ
+    const newCanvas = document.createElement('canvas');
+    newCanvas.id = 'userChart';
+    newCanvas.height = 150;
+    parent.appendChild(newCanvas);
+
+    // Hiển thị lại biểu đồ rỗng
+    renderUserChart([]);
+}
+
+    </script>
+</body>
+</html>
+

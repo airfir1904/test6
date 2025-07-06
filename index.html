@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AirFir</title>
+  <link rel="icon" type="image/png" href="airfir2.png" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-database.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Inter', sans-serif;
+      background: url('https://static.vecteezy.com/system/resources/previews/022/012/188/non_2x/white-studio-room-background-with-spotlight-on-illustrator-generative-ai-free-photo.jpg') center/cover no-repeat fixed;
+      color: #000000;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.5);
+      z-index: -1;
+      pointer-events: none;
+    }
+    .password-logo {
+      width: 250px;
+      margin-bottom: 24px;
+      filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));
+      animation: fadeInLogo 1s ease-in-out;
+    }
+    @keyframes fadeInLogo {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    header {
+      background: url('https://cdn-media.sforum.vn/storage/app/media/giangnguyen/trang-mau-la-gi-13.jpg') center/cover no-repeat;
+      color: #ffffff;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      padding: 0 24px;
+    }
+    header::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 1;
+    }
+    header > * {
+      position: relative;
+      z-index: 2;
+    }
+    #logo {
+  font-size: 1.8rem;
+  font-weight: 900;
+  white-space: nowrap;
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 18px; /* giống nav a */
+  border-radius: 8px;
+  transition: background 0.3s, color 0.3s;
+}
+
+#logo:hover {
+  background: #fff;
+  color: #000;
+  text-decoration: none;
+}
+
+
+    nav {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+    }
+   nav a {
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+    nav a:hover,
+    nav a[aria-current="page"] {
+      background: #fff;
+      color: #000;
+    }
+    #logoutBtn {
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      background: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    main {
+  padding: 24px;
+  max-width: 1024px;
+  margin: 100px auto 0;
+}
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 24px;
+      justify-content: center;
+    }
+    .card {
+      height: 120px;
+      border-radius: 16px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-size: cover;
+      background-position: center;
+      color: rgb(0, 0, 0);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+      cursor: pointer;
+    }
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    }
+    .card-1 { background-image: url('https://png.pngtree.com/...jpg'); }
+    .card-2 { background-image: url('data:image/jpeg;base64,...'); }
+    .card-3 { background-image: url('https://thegioivangnhapkhau.com/...jpg'); }
+    .card-4 { background-image: url('https://img.tripi.vn/...jpg'); }
+    .card-5 { background-image: url('https://vieclam123.vn/...jpg'); }
+    .card-6,
+    .card-7 { background-image: url('https://png.pngtree.com/...jpg'); }
+    #passwordOverlay {
+      position: fixed;
+      inset: 0;
+      background: url('https://static.vecteezy.com/...jpg') center/cover no-repeat, #000;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+    }
+    #passwordOverlay input,
+    #passwordOverlay button {
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      width: 280px;
+      max-width: 90vw;
+    }
+    #passwordOverlay button {
+      font-weight: 700;
+      background: #fff;
+      color: #000;
+    }
+    #passwordError {
+      color: #fffb00;
+      font-weight: 600;
+    }
+
+#createAccountBox,
+#loginExistingBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+#createAccountBox input,
+#createAccountBox button,
+#loginExistingBox input,
+#loginExistingBox button {
+  width: 280px;
+  max-width: 90vw;
+  padding: 12px;
+  border-radius: 10px;
+}
+
+
+#adminLoginBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+#adminLoginBox input,
+#adminLoginBox button {
+  width: 280px;
+  max-width: 90vw;
+  padding: 12px;
+  border-radius: 10px;
+}
+
+  </style>
+</head>
+<body>
+<div id="passwordOverlay">
+    <img src="airfir2.png" alt="AirFir Logo" class="password-logo" />
+   <h2>Chào mừng bạn đến với AirFir</h2>
+
+<div style="display: flex; flex-direction: column; gap: 16px;">
+  <button id="showCreateBoxBtn">Tôi chưa có tài khoản</button>
+  <button id="showLoginBoxBtn">Tôi đã có tài khoản</button>
+  <button id="showAdminLoginBtn">Tôi là admin</button>
+</div>
+
+<div id="createAccountBox" style="display: none;">
+  <button id="backFromCreateBtn" style="align-self: flex-start;">← Zurück</button>
+  <input type="text" id="fullnameInput" placeholder="Họ và tên" required />
+  <input type="email" id="emailInput" placeholder="E-mail" required />
+  <input type="password" id="passwordInput" placeholder="Mật khẩu" required />
+  <button id="createAccountBtn">Tạo tài khoản</button>
+  <div id="passwordError"></div>
+</div>
+
+<div id="loginExistingBox" style="display: none;">
+  <button id="backFromLoginBtn" style="align-self: flex-start;">← Zurück</button>
+  <input type="text" id="existingNameInput" placeholder="Họ và tên" />
+  <input type="password" id="existingPasswordInput" placeholder="Mật khẩu" />
+  <button id="loginExistingBtn">Đăng nhập</button>
+  <div id="existingLoginError"></div>
+</div>
+
+<div id="adminLoginBox" style="display: none;">
+  <button id="backFromAdminBtn" style="align-self: flex-start;">← Zurück</button>
+  <input type="text" id="adminIdInput" placeholder="Admin ID" />
+  <input type="password" id="adminPasswordInput" placeholder="Mật khẩu" />
+  <button id="adminLoginBtn">Đăng nhập (Admin)</button>
+  <div id="adminLoginError" style="color: yellow;"></div>
+</div>
+
+
+</div>
+
+
+<div id="app" aria-hidden="true">
+    <header>
+      <a id="logo" href="admin.html">AirFir</a>
+
+      <nav>
+        <a href="lotrinh.html">Schritt</a>
+        <a href="dokument.html">Dokumenten</a>
+
+        <a href="#" onclick="checkWortschatzPassword()" style="display: inline-flex; align-items: center; gap: 4px;">
+  Wortschatz
+  <img src="lock 2.png" alt="Locked" style="width: 16px; height: 16px;" />
+</a>
+
+
+
+        <a href="studienkolleg.html">Studienkolleg</a>
+        <a href="prüfung.html">Prüfung(Goethe)</a>
+        <a href="uns.html">Über Uns</a>
+        <a href="premium.html">V.I.P</a>
+      </nav>
+      <button id="logoutBtn">Đăng xuất</button>
+    </header>
+    <main>
+      <div class="card-grid">
+        <div class="card card-1" onclick="location.href='lotrinh.html'">Schritt</div>
+        <div class="card card-2" onclick="location.href='dokument.html'">Dokumenten</div>
+       
+        <div class="card card-3" onclick="checkWortschatzPassword()">
+  <span style="display: flex; align-items: center; gap: 8px;">
+    Wortschatz
+    <img src="lock 2.png" alt="Locked" style="width: 30px; height: 30px;" />
+  </span>
+</div>
+
+
+
+        <div class="card card-4" onclick="location.href='studienkolleg.html'">Studienkolleg</div>
+        <div class="card card-5" onclick="location.href='prüfung.html'">Prüfung (Goethe)</div>
+        <div class="card card-6" onclick="location.href='uns.html'">Über Uns</div>
+        <div class="card card-7" onclick="location.href='premium.html'">V.I.P
+        </div>
+      </div>
+    </main>
+  <!-- Chèn đoạn này vào sau phần </main> -->
+<div id="wortschatzPasswordBox"
+     style="display:none; position:fixed; inset:0; background:#000000c0; color:#fff; z-index:10001; flex-direction:column; justify-content:center; align-items:center;">
+
+  <!-- Nút đóng -->
+  <button onclick="closeWortschatzBox()"
+          style="position:absolute; top:20px; right:20px; background:transparent; border:none; font-size:28px; color:white; cursor:pointer;">×</button>
+
+  <h2>Passwort für "Wortschatz"</h2>
+ <input type="text" id="wortschatzNameInput" placeholder="Họ và tên" style="padding:12px; border-radius:8px; margin-bottom:12px; width:250px;" />
+ <input type="password" id="wortschatzPasswordInput" placeholder="Mật khẩu" style="padding:12px; border-radius:8px; margin-bottom:12px; width:250px;" />
+  <button onclick="submitWortschatzPassword()"
+          style="padding:12px 20px; border-radius:8px; font-weight:600;">Einloggen</button>
+  <p id="wortschatzPasswordError" style="color:yellow; margin-top:10px;"></p>
+</div>
+
+
+
+  </div>
+
+ <script>
+document.addEventListener('DOMContentLoaded', function () {
+  if (localStorage.getItem('isAuthenticated') === 'true') {
+    document.getElementById('passwordOverlay').style.display = 'none';
+    document.getElementById('app').setAttribute('aria-hidden', 'false');
+  } else {
+    document.getElementById('passwordOverlay').style.display = 'flex';
+    document.getElementById('app').setAttribute('aria-hidden', 'true');
+  }
+
+  document.getElementById('logoutBtn').addEventListener('click', function () {
+    localStorage.removeItem('isAuthenticated');
+    location.reload();
+  });
+
+  document.getElementById('createAccountBtn').addEventListener('click', function () {
+    const fullname = document.getElementById('fullnameInput').value.trim();
+    const email = document.getElementById('emailInput').value.trim();
+    const password = document.getElementById('passwordInput').value.trim();
+    const errorMsg = document.getElementById('passwordError');
+
+    if (fullname && email && password) {
+      const newUser = {
+        name: fullname,
+        email: email,
+        password: password,
+        loginTime: new Date().toISOString()
+        
+      };
+ saveLogin(fullname);
+      let users = JSON.parse(localStorage.getItem('regularUsers')) || [];
+      const exists = users.some(user => user.name === fullname);
+      if (exists) {
+        errorMsg.textContent = 'Tài khoản đã tồn tại.';
+        return;
+      }
+
+      users.push(newUser);
+      localStorage.setItem('regularUsers', JSON.stringify(users));
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('currentUserName', fullname);
+      document.getElementById('passwordOverlay').style.display = 'none';
+      document.getElementById('app').setAttribute('aria-hidden', 'false');
+    } else {
+      errorMsg.textContent = 'Vui lòng nhập đầy đủ họ tên, gmail và mật khẩu.';
+    }
+  });
+
+  document.getElementById('loginExistingBtn').addEventListener('click', function () {
+    const name = document.getElementById('existingNameInput').value.trim();
+    const password = document.getElementById('existingPasswordInput').value;
+    const errorBox = document.getElementById('existingLoginError');
+
+    const users = JSON.parse(localStorage.getItem('regularUsers')) || [];
+    const foundUser = users.find(user => user.name === name && user.password === password);
+
+    if (foundUser) {
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('currentUserName', name);
+      document.getElementById('passwordOverlay').style.display = 'none';
+      document.getElementById('app').setAttribute('aria-hidden', 'false');
+      saveLogin(name);
+      
+    } else {
+      errorBox.textContent = 'Họ tên hoặc mật khẩu không đúng.';
+    }
+
+   
+
+  });
+
+  document.getElementById('showCreateBoxBtn').addEventListener('click', function () {
+  document.getElementById('createAccountBox').style.display = 'flex';
+  document.getElementById('loginExistingBox').style.display = 'none';
+  this.parentElement.style.display = 'none'; // ẩn cả nhóm nút chọn
+});
+
+document.getElementById('showLoginBoxBtn').addEventListener('click', function () {
+  document.getElementById('loginExistingBox').style.display = 'flex';
+  document.getElementById('createAccountBox').style.display = 'none';
+  this.parentElement.style.display = 'none'; // ẩn cả nhóm nút chọn
+});
+
+
+document.getElementById('backFromCreateBtn').addEventListener('click', function () {
+  document.getElementById('createAccountBox').style.display = 'none';
+  document.getElementById('loginExistingBox').style.display = 'none';
+  document.querySelector('#passwordOverlay > div').style.display = 'flex'; // 👈 dòng này để hiện lại nhóm nút chọn
+});
+
+document.getElementById('backFromLoginBtn').addEventListener('click', function () {
+  document.getElementById('createAccountBox').style.display = 'none';
+  document.getElementById('loginExistingBox').style.display = 'none';
+  document.querySelector('#passwordOverlay > div').style.display = 'flex'; // 👈 dòng này để hiện lại nhóm nút chọn
+});
+
+
+
+  window.checkWortschatzPassword = function () {
+    const overlay = document.getElementById('wortschatzPasswordBox');
+    overlay.style.display = 'flex';
+  }
+
+  window.submitWortschatzPassword = function () {
+    const name = document.getElementById('wortschatzNameInput').value.trim();
+    const inputPassword = document.getElementById('wortschatzPasswordInput').value;
+    const error = document.getElementById('wortschatzPasswordError');
+
+    const authorizedUsers = [
+      { name: "Võ Thành Duy", password: "2005" },
+      { name: "Trần Thị B", password: "222222" },
+      { name: "Lê Văn C", password: "333333" },
+    ];
+
+    const foundUser = authorizedUsers.find(user => user.name === name && user.password === inputPassword);
+
+    if (foundUser) {
+      localStorage.setItem('wortschatzUser', name);
+      window.location.href = 'wortschatz.html';
+    } else {
+      error.textContent = 'Họ tên hoặc mật khẩu không đúng.';
+    }
+  }
+
+  window.closeWortschatzBox = function () {
+    document.getElementById('wortschatzPasswordBox').style.display = 'none';
+  }
+
+
+
+  // Nút nhấn "Tôi là admin"
+document.getElementById('showAdminLoginBtn').addEventListener('click', function () {
+  document.getElementById('adminLoginBox').style.display = 'flex';
+  document.getElementById('createAccountBox').style.display = 'none';
+  document.getElementById('loginExistingBox').style.display = 'none';
+  this.parentElement.style.display = 'none';
+});
+
+// Nút quay lại
+document.getElementById('backFromAdminBtn').addEventListener('click', function () {
+  document.getElementById('adminLoginBox').style.display = 'none';
+  document.querySelector('#passwordOverlay > div').style.display = 'flex';
+});
+
+// Xử lý đăng nhập admin
+document.getElementById('adminLoginBtn').addEventListener('click', function () {
+  const id = document.getElementById('adminIdInput').value.trim();
+  const password = document.getElementById('adminPasswordInput').value.trim();
+  const errorBox = document.getElementById('adminLoginError');
+
+  const admins = [
+    { id: 'Võ Thành Duy', password: '2005' },
+    { id: 'Nguyễn Tăng Gia Hưng', password: '2005' },
+    { id: 'Trần Vân Anh', password: '2006' },
+    { id: 'Thịnh Nguyễn', password: '2007' }
+  ];
+
+ const found = admins.find(admin =>
+  admin.id.trim().toLowerCase() === id.toLowerCase() &&
+  admin.password === password
+);
+  if (found) {
+    localStorage.setItem('isAuthenticated', 'true');
+    localStorage.setItem('currentAdmin', id);
+   window.location.href = 'index.html'; // hoặc 'trangchu.html' tùy file chính của bạn
+  } else {
+    errorBox.textContent = 'ID hoặc mật khẩu không đúng.';
+  }
+});
+
+});
+</script>
+
+</body>
+</html>
